@@ -38,6 +38,35 @@ fn from_file<'a>(mut file: File) -> Vec<Item<'a>> {
 }
 */
 
+fn get_most_valued_sentence<'a>(string: &'a mut String, vec: Vec<Item>) -> &'a str {
+    let mut most_valuable: &str = "";
+    let mut most_value: usize = 0;
+    let split = string.split('.');
+
+    for sentence in split {
+        let mut value: usize = 0;
+
+        for word in sentence.split(' ') {
+
+            for item in &vec {
+                if item.get_key() == word {
+                    value += item.get_value();
+                    break;
+                }
+            }
+
+        }
+
+        if value > most_value {
+            most_value = value;
+            most_valuable = sentence.clone();
+        }
+
+    }
+
+    most_valuable
+}
+
 fn get_value(string: &str) -> usize {
 
     // The initial value is the length of the str.
@@ -70,6 +99,10 @@ impl<'a> Item<'a> {
 
     fn get_value(&self) -> usize {
         self.value
+    }
+
+    fn get_key(&self) -> &str {
+        self.key
     }
 }
 
@@ -115,5 +148,16 @@ mod tests {
         let item = Item {key: "testing", value: 16};
         assert_eq!(vec.get(0).unwrap().get_value(), item.get_value());
     }
+
+
+    #[test]
+    fn simple_most_valued_sentence() {
+        let mut string: String = "Now, this is a story all about testing. \
+        And wheather the testing is worth the time it takes to write the test cases or not.".to_string();
+        let mut string2 = string.clone();
+        let mut vec = index(&mut string);
+        assert_eq!(get_most_valued_sentence(&mut string2, vec), " And wheather the testing is worth the time it takes to write the test cases or not");
+    }
+
 
 }
